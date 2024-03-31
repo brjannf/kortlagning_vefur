@@ -1,10 +1,10 @@
 ﻿@page
+@using kortlagning_vefur.Components;
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Kortlagning MHR";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">Bara að byrja á þessu</a>.</p>
-</div>
+@(await Html.RenderComponentAsync<Vorsluslist>(RenderMode.ServerPrerendered))
+
+<script src="_framework/blazor.server.js"></script>

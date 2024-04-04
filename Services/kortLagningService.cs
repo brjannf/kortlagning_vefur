@@ -88,6 +88,120 @@ namespace kortlagning_vefur.Services
             }
         }
 
+       
+        public IQueryable<kortlagning> GetKortlagningarVorslu(string strVarsla, string strLeitVorslustofnun, string strLeitSkjalmyndari, string strLeitSveitarfélag, string strLeitHeitiKerfis, string strLeitGerdSafns, string strLeitHlutverk, string strleitAbyrgd, string strLeitStarfsEining, string strLeitTengilidur, string strLeitBirgi, string strLeitHysing, string strLeitDagsNotkun, string strLeitDagsTilkynnt, string strLeitVardveisla, string strLeitStaerd, string strLeitNotkun, string strLeitAthugasemdir, string strLeitSkil, bool bLeitSkilad)
+        {
+            kort.hreinsaHlut();
+            if (!string.IsNullOrEmpty(strLeitVorslustofnun))
+            {
+                kort.Varsla_heiti = strLeitVorslustofnun;  
+            }
+            if (!string.IsNullOrEmpty(strLeitSkjalmyndari))
+            {
+                kort.Skjalm_heiti = strLeitSkjalmyndari;
+            }
+            if (!string.IsNullOrEmpty(strLeitSveitarfélag))
+            {
+                kort.Sveitarfelag = strLeitSveitarfélag;
+            }
+            if (!string.IsNullOrEmpty(strLeitHeitiKerfis))
+            {
+                kort.Heiti_kerfis = strLeitHeitiKerfis;
+            }
+            if (!string.IsNullOrEmpty(strLeitGerdSafns) && strLeitGerdSafns != "0")
+            {
+                kort.Rafraen_sofn = strLeitGerdSafns;
+            }
+            if (!string.IsNullOrEmpty(strLeitHlutverk) && strLeitHlutverk != "0")
+            {
+                kort.Hlutverk = strLeitHlutverk;
+            }
+            if (!string.IsNullOrEmpty(strleitAbyrgd))
+            {
+                kort.Abyrgd_umsjon = strleitAbyrgd;
+            }
+            if (!string.IsNullOrEmpty(strLeitStarfsEining))
+            {
+                kort.Starfseining = strLeitStarfsEining;
+            }
+            
+            if (!string.IsNullOrEmpty(strLeitTengilidur))
+            {
+                kort.Tengilidur_starfseiningar = strLeitTengilidur;
+            }
+            if (!string.IsNullOrEmpty(strLeitBirgi))
+            {
+                kort.Birgi = strLeitBirgi;
+            }
+            if (!string.IsNullOrEmpty(strLeitHysing))
+            {
+                kort.Hysing = strLeitHysing;
+            }
+            if (!string.IsNullOrEmpty(strLeitDagsNotkun))
+            {
+                kort.Dags_tekid_i_notkun = strLeitDagsNotkun;
+            }
+            if (!string.IsNullOrEmpty(strLeitDagsTilkynnt))
+            {
+                kort.Dags_tilkynnt = strLeitDagsTilkynnt;
+            }
+            if (!string.IsNullOrEmpty(strLeitVardveisla) && strLeitVardveisla != "0")
+            {
+                kort.Vardveisla = strLeitVardveisla;
+            }
+            if (!string.IsNullOrEmpty(strLeitStaerd))
+            {
+                kort.Staerd = strLeitStaerd;
+            }
+            if (!string.IsNullOrEmpty(strLeitNotkun) && strLeitNotkun != "0")
+            {
+                kort.Notkun = strLeitNotkun;
+            }
+            if (!string.IsNullOrEmpty(strLeitAthugasemdir))
+            {
+                kort.Athugasemdir = strLeitAthugasemdir;
+            }
+            if (!string.IsNullOrEmpty(strLeitSkil))
+            {
+                kort.Aaetlud_skil = strLeitSkil;
+            }
+            if(bLeitSkilad != null)
+            {
+                kort.Skilad = bLeitSkilad;
+            }
+            DataTable dt = kort.getKortLagningLeitVarsla(strVarsla);
+
+            return (IQueryable<kortlagning>)dt.AsEnumerable().Select(row => new kortlagning
+            {
+                //id, herID, skjalID, heiti_kerfis, rafraen_sofn, hlutverk, abyrgd_umsjon, starfseining, tengilidur_starfseiningar, birgi, hysing, dags_tekid_i_notkun, dags_tilkynnt, vardveisla, staerd, notkun, athugasemdir, aaetlud_skil
+                ID = Convert.ToInt32(row["ID"]),
+                Varsla_heiti = row["varsla_heiti"].ToString(),
+                Varsla_audkenni = row["audkenni"].ToString(),
+                SkjalID = Convert.ToInt32(row["skjalID"]),
+                Skjalm_heiti = row["skjalm_heiti"].ToString(),
+                Sveitarfelag = row["sveitarfelag"].ToString(),
+                Heiti_kerfis = row["heiti_kerfis"].ToString(),
+                Rafraen_sofn = row["rafraen_sofn"].ToString(),
+                Hlutverk = row["hlutverk"].ToString(),
+                Abyrgd_umsjon = row["abyrgd_umsjon"].ToString(),
+                Starfseining = row["starfseining"].ToString(),
+                Tengilidur_starfseiningar = row["tengilidur_starfseiningar"].ToString(),
+                Birgi = row["birgi"].ToString(),
+                Hysing = row["hysing"].ToString(),
+                Dags_tekid_i_notkun = row["dags_tekid_i_notkun"].ToString(),
+                Dags_tilkynnt = row["dags_tilkynnt"].ToString(),
+                Vardveisla = row["vardveisla"].ToString(),
+                Staerd = row["staerd"].ToString(),
+                Notkun = row["notkun"].ToString(),
+                Athugasemdir = row["athugasemdir"].ToString(),
+                Aaetlud_skil = row["aaetlud_skil"].ToString(),
+                Skilad = Convert.ToBoolean(row["skilad"])
+
+            }).AsQueryable();
+
+        }
+
+
         public IQueryable<kortlagning> GetKortlagningarVorslu(string strVarsla)
         {
             DataTable dt = kort.getKortLagning(strVarsla);
@@ -121,7 +235,6 @@ namespace kortlagning_vefur.Services
             }).AsQueryable();
 
         }
-
         public IQueryable<kortlagning> GetKortlagningarEinFaersla(int iID)
         {
             DataTable dt = kort.getKortLagning(iID);
@@ -301,6 +414,7 @@ namespace kortlagning_vefur.Services
             kort.Vista();
 
         }
+        
 
         public void flytjainnKortlagningu(DataTable dt, int idSkjal, string strVarsla)
         {
@@ -312,8 +426,22 @@ namespace kortlagning_vefur.Services
                 kort.Rafraen_sofn = row["Rafraen_sofn"].ToString();
                 kort.Abyrgd_umsjon = row["Abyrgd_umsjon"].ToString();
                 //ná hér í auðkenni hlutverks eða bæta við ef ekki er til?
-                // if (row["Hlutverk"]) sækja hlutverk ef til þá þetta annars hitt
-                kort.Hlutverk = "1"; // row["Abyrgd_umsjon"].ToString();
+                string strHlutverk = row["Hlutverk"].ToString();
+                IQueryable < kortlagning> hlutverk = getHluverk();
+                foreach(var hlut in hlutverk)
+                {
+                    if (hlut.Hlutverk == strHlutverk)
+                    {
+                        kort.Hlutverk = hlut.ID.ToString();
+                    }
+                }
+                if (string.IsNullOrEmpty(kort.Hlutverk))
+                {
+                    //skrá nýtt hlutverk?
+                    kort.Hlutverk = kort.vistaHlutVerk(strHlutverk).ToString();
+
+                }
+              
                 kort.Starfseining = row["Starfseining"].ToString();
                 kort.Tengilidur_starfseiningar = row["Tengilidur_starfseiningar"].ToString();
                 kort.Birgi = row["Birgi"].ToString(); 

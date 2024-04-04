@@ -75,7 +75,7 @@
     <DialogBody>
         @if(bImport)
             {
-                <table align="left" style="vertical-align: top;">
+                <table style="vertical-align: top;">
                     <tr>
                         <td>
                             <b>Skjalamyndari</b>
@@ -83,7 +83,7 @@
                     </tr>
                     <tr>
                         <td>
-                            @if (_httpContext.HttpContext.Session.GetString("_User") == strAudkenni || strAudkenni == string.Empty)
+                            @if (strNOTANDI.ToUpper() == strAudkenni.ToUpper() && !bBreyta)
                             {
                                 <select @bind="iIDskjal" @onclick="e => selectSkjalmynd()">
                                     <option value="0">Veldu skjalamyndara</option>
@@ -95,16 +95,7 @@
                             }
                         </td>
                         <td style="width: 259px;">
-                            @*  @if(iIDskjal == 0)
-                    {
-                    <button @onclick="e => skraSkjalamyndar()">skrá nýjan skjalamyndara</button>
-                    }
-                    else
-                    {
-                    <button @onclick="e => skraSkjalamyndar()">Breyta skjalamyndara</button>
-                    } *@
-
-                        </td>
+                         </td>
                     </tr>
                     <tr>
                         <td>
@@ -166,17 +157,17 @@
                                 </td>
                                 <tr>
                                     <td>
-                                        @if (_httpContext.HttpContext.Session.GetString("_User") == strAudkenni || strAudkenni == string.Empty)
+
+                                    </td>
+                                    <td align="right">
+                                        @if (strNOTANDI.ToUpper() == strAudkenni.ToUpper() && !bBreyta)
                                         {
                                             @if (iIDskjal == 0)
                                             {
                                                 @if (strSkjalHeiti != string.Empty)
-                                                {
+                                               {
                                                     <button id="nytt" @onclick="e => nyskraSkjalamyndara()">Skrá nýjan skjalamyndara</button>
-                                                }
-
-
-
+                                               }
                                             }
                                             else
                                             {
@@ -194,16 +185,95 @@
                     </tr>
                 </table>
 
-                <InputFile OnChange="@OpenExcelFileFromDisk" />
-                <button @onclick="e => importToDatabase()">Flytja inn</button>
+
+                @if (iIDskjal != 0)
+                {
+
+
+                    <InputFile OnChange="@OpenExcelFileFromDisk" />
+                    @if(dt.Rows.Count != 0)
+                    {
+                        <button @onclick="e => importToDatabase()">Flytja inn</button>
+                    }
+                   
+
+                <p>
+                    <label><input type="checkbox" @bind="showAbyrgdImport" /> Ábyrgð/umsjón</label>
+                        <label><input type="checkbox" @bind="showStarfseiningImport" /> Starfseining</label>
+                        <label><input type="checkbox" @bind="showTengilidImport" /> Tengiliður starfseiningar</label>
+                        <label><input type="checkbox" @bind="showBirgjaImport" /> Þjónustuaðili/birgi</label>
+                        <label><input type="checkbox" @bind="showHysingImport" /> Hýsing</label>
+                        <label><input type="checkbox" @bind="showDagsNotkunImport" /> Dags. tekið í notkun</label>
+                        <label><input type="checkbox" @bind="showDagsTilkynntImport" />Dags. tilkynnt</label>
+                        <label><input type="checkbox" @bind="showVardveislaImport" />Varðveisla</label>
+                        <label><input type="checkbox" @bind="showStaerdImport" />Stærð GB/fjöldi færslna</label>
+                        <label><input type="checkbox" @bind="showNotkunImport" />Notkun</label>
+                        <label><input type="checkbox" @bind="ShowAthugasemdirImport" />Athugasemdir</label>
+                        <label><input type="checkbox" @bind="ShowSkilImport" />Áætluð skil</label>
+                        <label><input type="checkbox" @bind="ShowSkilBuidImport" />Búið að skila</label>
+                </p>
 
                 <QuickGrid Items="@getImport()" Virtualize="true">
-                 <PropertyColumn Property="@(p => p.Varsla_heiti)" Sortable="true" Title="Vörslustofnun" Align="Align.Left" />
-                 <PropertyColumn Property="@(p => p.Skjalm_heiti)" Sortable="true" Title="Skjalamyndari"/>
-                 <PropertyColumn Property="@(p => p.Sveitarfelag)" Sortable="true" Title="Sveitarfélag" />
-                 <PropertyColumn Property="@(p => p.Heiti_kerfis)" Sortable="true" Title="Heiti kerfis" />
+                        <PropertyColumn Property="@(p => p.Skjalm_heiti)" Sortable="true" Title="Skjalamyndari" />
+                        <PropertyColumn Property="@(p => p.Sveitarfelag)" Sortable="true" Title="Sveitarfélag" />
+                        <PropertyColumn Property="@(p => p.Heiti_kerfis)" Sortable="true" Title="Heiti kerfis" />
+                        <PropertyColumn Property="@(p => p.Rafraen_sofn)" Sortable="true" Title="Gerð safns" />
+                        <PropertyColumn Property="@(p => p.Hlutverk)" Sortable="true" Title="Hlutverk" />
+
+                        @if (showAbyrgdImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Abyrgd_umsjon)" Sortable="true" Title="Ábyrgð/umsjón" />
+                        }
+                        @if (showStarfseiningImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Starfseining)" Sortable="true" />
+                        }
+                        @if (showTengilidImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Tengilidur_starfseiningar)" Sortable="true" Title="Tengiliður starfseiningar" />
+                        }
+                        @if (showBirgjaImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Birgi)" Sortable="true" Title="Þjónustuaðili/birgi" />
+                        }
+                        @if (showHysingImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Hysing)" Sortable="true" Title="Hýsing" />
+                        }
+                        @if (showDagsNotkunImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Dags_tekid_i_notkun)" Sortable="true" Title="Dags. tekið í notkun" />
+                        }
+                        @if (showDagsTilkynntImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Dags_tilkynnt)" Sortable="true" Title="Dags. tilkynnt" />
+                        }
+                        @if (showVardveislaImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Vardveisla)" Sortable="true" Title="Varðveisla" />
+                        }
+                        @if (showStaerdImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Staerd)" Sortable="true" Title="Stærð GB/fjöldi færslna" />
+                        }
+                        @if (showNotkunImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Notkun)" Sortable="true" Title="Notkun" />
+                        }
+                        @if (ShowAthugasemdirImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Athugasemdir)" Sortable="true" Align="Align.Start" />
+                        }
+                        @if (ShowSkilImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Aaetlud_skil)" Sortable="true" Title="Áætluð skil" />
+                        }
+                        @if (ShowSkilBuidImport)
+                        {
+                            <PropertyColumn Property="@(p => p.Skilad)" Sortable="true" Title="Búið að skila" />
+                        }
                  </QuickGrid>
-               
+                }
             }
             else
             {
@@ -225,7 +295,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            @if (_httpContext.HttpContext.Session.GetString("_User") == strAudkenni || strAudkenni == string.Empty)
+                                                            @if (strNOTANDI.ToUpper() == strAudkenni.ToUpper())
                                                             {
                                                                 <select @bind="iIDskjal" @onclick="e => selectSkjalmynd()">
                                                                     <option value="0">Veldu skjalamyndara</option>
@@ -308,7 +378,7 @@
                                                                 </td>
                                                                 <tr>
                                                                     <td>
-                                                                        @if (_httpContext.HttpContext.Session.GetString("_User") == strAudkenni || strAudkenni == string.Empty)
+                                                                        @if (strNOTANDI.ToUpper() == strAudkenni.ToUpper() || !bBreyta)
                                                                         {
                                                                             @if (iIDskjal == 0)
                                                                             {
@@ -412,7 +482,7 @@
                                                                     {
                                                                         <option value=@notkun.Notkun>@notkun.Notkun</option>
                                                                     }
-                                                                </select><br />
+                                                                </select>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -493,7 +563,7 @@
                                                         </tr>
                                                         <tr>
                                                             <td>
-                                                                Áætlað afhendingaár
+                                                               Búið að skila?
                                                             </td>
                                                             <td>
                                                                 <label><input type="checkbox" @bind="bKortSkilad" /> Búið að skila</label>
@@ -510,7 +580,7 @@
                                                         </tr>
                                                         <tr>
                                                             <td>
-                                                                @if (_httpContext.HttpContext.Session.GetString("_User") == strAudkenni || !bBreyta)
+                                                                @if (strNOTANDI.ToUpper() == strAudkenni.ToUpper() || !bBreyta)
                                                                 {
                                                                     @if (strKortHeiti != string.Empty && strKortGerd != string.Empty && strKortHlutverk != string.Empty && strKortVardveisla != string.Empty && strKortNotkun != string.Empty)
                                                                     {
@@ -554,7 +624,7 @@
                 {
                     <div>
                         Viltu eyða þessari færslu?
-                        @if (_httpContext.HttpContext.Session.GetString("_User") == strAudkenni && !bBreyta)
+                        @if (strNOTANDI.ToUpper() == strAudkenni.ToUpper() && !bBreyta)
                         {
                             <button type="button" class="btn btn-primary" @onclick="@(()=>  { dialogResult = "yes"; isShowing = false; bBreyta=false; bEyda=false; })">Já</button>
                             <button type="button" class="btn btn-secondary" @onclick="@(()=> { dialogResult = "no"; isShowing = false; bBreyta=false; bEyda= false;  })">Nei</button>
@@ -570,17 +640,17 @@
 
     </DialogBody>
     <DialogFooter>
-            <button type="button" class="btn btn-secondary" @onclick="@(()=> { dialogResult = "no"; isShowing = false; bBreyta=false; bEyda=false; bImport=false; })">Hætta við</button>
+            <button type="button" class="btn btn-secondary" @onclick="@(()=> { dialogResult = "no"; isShowing = false; bBreyta=false; bEyda=false; bImport=false; dt.Rows.Clear(); iIDskjal =0; iIDeyda =0; })">Hætta við</button>
     </DialogFooter>
 </Dialog>
 
-<div class="mt-3">DialogResult: <code>
+ <code>
     @if (dialogResult == "yes")
             eydaKort();
-            @isShowing = false;
-    </code></div>
+           @*  @isShowing = false; *@
+    </code>
 
-<DialogOutput/>
+@* <DialogOutput/> *@
 
 <div class=".grid">
 <table> <tr><td>
@@ -606,82 +676,217 @@
                             <label><input type="checkbox" @bind="ShowSkilBuid" />Búið að skila</label>
                         </p>
                     }
-
+                    <div> 
                     <QuickGrid Items="@GetKortlagningar()" Pagination="@pagination">
-                        <PropertyColumn Property="@(p => p.Varsla_heiti)" Sortable="true" Title="Vörslustofnun" Align="Align.Left" />
-    <PropertyColumn Property="@(p => p.Skjalm_heiti)" Sortable="true" Title="Skjalamyndari"/>
-    <PropertyColumn Property="@(p => p.Sveitarfelag)" Sortable="true" Title="Sveitarfélag" />
-    <PropertyColumn Property="@(p => p.Heiti_kerfis)" Sortable="true" Title="Heiti kerfis" />
-    <PropertyColumn Property="@(p => p.Rafraen_sofn)" Sortable="true" Title="Gerð safns" />
-    <PropertyColumn Property="@(p => p.Hlutverk)" Sortable="true" Title="Hlutverk" />
-
+                        
+                        <PropertyColumn Property="@(p => p.Varsla_heiti)" Sortable="true" Class="country-name" Title="Vörslustofnun">
+                        <ColumnOptions>
+                            <div class="search-box">
+                                                    <input type="search" autofocus @bind="strLeitVorslustofnun" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Heiti vörslustofnunar..." />
+                            </div>
+                        </ColumnOptions>
+                        </PropertyColumn>
+                        <PropertyColumn Property="@(p => p.Skjalm_heiti)" Sortable="true" Title="Skjalamyndari">
+                         <ColumnOptions>
+                            <div class="search-box">
+                                                    <input type="search" autofocus @bind="strLeitSkjalmyndari" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Heiti skjalamyndara..." />
+                            </div>
+                        </ColumnOptions>
+                        </PropertyColumn>
+                        <PropertyColumn Property="@(p => p.Sveitarfelag)" Sortable="true" Title="Sveitarfélag" >
+                                <ColumnOptions>
+                                    <div class="search-box">
+                                        <input type="search" autofocus @bind="strLeitSveitarfélag" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Heiti sveitarfélags..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>
+                            <PropertyColumn Property="@(p => p.Heiti_kerfis)" Sortable="true" Title="Heiti kerfis">
+                             <ColumnOptions>
+                                    <div class="search-box">
+                                        <input type="search" autofocus @bind="strLeitHeitiKerfis" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Heiti kerfis..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>
+                             <PropertyColumn Property="@(p => p.Rafraen_sofn)" Sortable="true" Title="Gerð safns" >
+                            <ColumnOptions>
+                                    <div class="search-box">
+                                        <select id="vardveisla" @bind="strLeitGerdSafns">
+                                            <option value="0">Veldu gerð</option>
+                                            @foreach (var gerd in getEnumGerd())
+                                            {
+                                                <option value=@gerd.Rafraen_sofn>@gerd.Rafraen_sofn</option>
+                                            }
+                                        </select>
+                                     @*    <input type="search" autofocus @bind="strLeitGerdSafns" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Heiti kerfis..." /> *@
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>
+                             <PropertyColumn Property="@(p => p.Hlutverk)" Sortable="true" Title="Hlutverk" >
+                                   <ColumnOptions>
+                                    <div class="search-box">
+                                        <select id="leitHlutverk" @bind="strLeitHlutverk">
+                                            <option value="0">Veldu hlutverk kerfis</option>
+                                            @foreach (var hlut in getHlutverk())
+                                            {
+                                                <option value=@hlut.Hlutverk>@hlut.Hlutverk</option>
+                                            }
+                                        </select>
+                                     </div>
+                                 </ColumnOptions>
+                            </PropertyColumn>
                         @if (showAbyrgd)
                         {
-                            <PropertyColumn Property="@(p => p.Abyrgd_umsjon)" Sortable="true" Title="Ábyrgð/umsjón" />
+                            <PropertyColumn Property="@(p => p.Abyrgd_umsjon)" Sortable="true" Title="Ábyrgð/umsjón" >
+                                 <ColumnOptions>
+                                    <div class="search-box">
+                                        <input type="search" autofocus @bind="strleitAbyrgd" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Ábyrgð og umsjón..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>
                         }
                         @if(showStarfseining)
                         {
-                        <PropertyColumn Property="@(p => p.Starfseining)" Sortable="true" />
+                        <PropertyColumn Property="@(p => p.Starfseining)" Sortable="true">
+                              <ColumnOptions>
+                                    <div class="search-box">
+                                        <input type="search" autofocus @bind="strLeitStarfsEining" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Starfseining..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>
                         }
                         @if(showTengilid)
                         {
-                        <PropertyColumn Property="@(p => p.Tengilidur_starfseiningar)" Sortable="true" Title="Tengiliður starfseiningar" />
-                        }
+                        <PropertyColumn Property="@(p => p.Tengilidur_starfseiningar)" Sortable="true" Title="Tengiliður starfseiningar" >
+                            <ColumnOptions>
+                                    <div class="search-box">
+                                        <input type="search" autofocus @bind="strLeitTengilidur" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Tengiliður..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>                        }
                         @if(showBirgja)
                         {
-                            <PropertyColumn Property="@(p => p.Birgi)" Sortable="true" Title="Þjónustuaðili/birgi" />
+                            <PropertyColumn Property="@(p => p.Birgi)" Sortable="true" Title="Þjónustuaðili/birgi" >
+                                  <ColumnOptions>
+                                    <div class="search-box">
+                                            <input type="search" autofocus @bind="strLeitBirgi" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Þjónustuaðili/birgi..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>  
                         }
                         @if (showHysing)
                         {
-                            <PropertyColumn Property="@(p => p.Hysing)" Sortable="true" Title="Hýsing" />
+                            <PropertyColumn Property="@(p => p.Hysing)" Sortable="true" Title="Hýsing" >
+                                 <ColumnOptions>
+                                    <div class="search-box">
+                                            <input type="search" autofocus @bind="strLeitHysing" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Hýsing..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>  
                         }
                         @if(showDagsNotkun)
                         {
-                            <PropertyColumn Property="@(p => p.Dags_tekid_i_notkun)" Sortable="true" Title="Dags. tekið í notkun" />
+                            <PropertyColumn Property="@(p => p.Dags_tekid_i_notkun)" Sortable="true" Title="Dags. tekið í notkun" >
+                                <ColumnOptions>
+                                    <div class="search-box">
+                                        <input type="search" autofocus @bind="strLeitDagsNotkun" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Dags. tekið í notkun..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>  
                         }
                         @if(showDagsTilkynnt)
                         {
-                            <PropertyColumn Property="@(p => p.Dags_tilkynnt)" Sortable="true" Title="Dags. tilkynnt" />
+                            <PropertyColumn Property="@(p => p.Dags_tilkynnt)" Sortable="true" Title="Dags. tilkynnt" >
+                                 <ColumnOptions>
+                                    <div class="search-box">
+                                            <input type="search" autofocus @bind="strLeitDagsTilkynnt" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Dags. tilkynnt..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>  
                         }
                         @if(showVardveisla)
                         {
-                            <PropertyColumn Property="@(p => p.Vardveisla)" Sortable="true" Title="Varðveisla" />
+                            <PropertyColumn Property="@(p => p.Vardveisla)" Sortable="true" Title="Varðveisla" >
+                                 <ColumnOptions>
+                                    <div class="search-box">
+                                        <select id="leitVardVeisla" @bind="strLeitVardveisla">
+                                            <option value="0">Veldu varðveislu</option>
+                                            @foreach (var vard in getEnumVardveisla())
+                                            {
+                                                    <option value=@vard.Vardveisla>@vard.Vardveisla</option>
+                                            }
+                                        </select>
+                                     </div>
+                                 </ColumnOptions>
+                            </PropertyColumn>
                         }
                         @if(showStaerd)
                         {
-                            <PropertyColumn Property="@(p => p.Staerd)" Sortable="true" Title="Stærð GB/fjöldi færslna" />
+                            <PropertyColumn Property="@(p => p.Staerd)" Sortable="true" Title="Stærð GB/fjöldi færslna" >
+                                  <ColumnOptions>
+                                    <div class="search-box">
+                                            <input type="search" autofocus @bind="strLeitStaerd" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Stærð GB/fjöldi færslna..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>  
                         }
                         @if(showNotkun)
                         {
-                            <PropertyColumn Property="@(p => p.Notkun)" Sortable="true" Title="Notkun" />
+                            <PropertyColumn Property="@(p => p.Notkun)" Sortable="true" Title="Notkun" >
+                            <ColumnOptions>
+                                    <div class="search-box">
+                                        <select id="leitVardVeisla" @bind="strLeitNotkun">
+                                            <option value="0">Veldu notkun</option>
+                                            @foreach (var not in getEnumNotkun())
+                                            {
+                                                    <option value=@not.Notkun>@not.Notkun</option>
+                                            }
+                                        </select>
+                                     </div>
+                                 </ColumnOptions>
+                            </PropertyColumn>
                         }
                         @if(ShowAthugasemdir)
                         {
-                            <PropertyColumn Property="@(p => p.Athugasemdir)" Sortable="true" Align="Align.Start"/>
+                            <PropertyColumn Property="@(p => p.Athugasemdir)" Sortable="true" Align="Align.Start">
+                             <ColumnOptions>
+                                    <div class="search-box">
+                                        <input type="search" autofocus @bind="strLeitAthugasemdir" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Athugasemdir..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn>  
                         }
                         @if(ShowSkil)
                         {
-                            <PropertyColumn Property="@(p => p.Aaetlud_skil)" Sortable="true" Title="Áætluð skil" />
+                            <PropertyColumn Property="@(p => p.Aaetlud_skil)" Sortable="true" Title="Áætluð skil" >
+                                 <ColumnOptions>
+                                    <div class="search-box">
+                                            <input type="search" autofocus @bind="strLeitSkil" @oninput="(EventArgs) => GetKortlagningar()" placeholder=" Áætluð skil..." />
+                                    </div>
+                                </ColumnOptions>
+                            </PropertyColumn> 
                         }
                         @if (ShowSkilBuid)
                         {
-                            <PropertyColumn Property="@(p => p.Skilad)" Sortable="true" Title="Búið að skila" />
+                            <PropertyColumn Property="@(p => p.Skilad)" Sortable="true" Title="Búið að skila" >
+                                 <ColumnOptions>
+                         <label>
+                                 <input type="checkbox" @bind="bLeitSkilad"  /> skilað
+                          </label>
+                        </ColumnOptions>
+                         </PropertyColumn>
                         }
-
-
-
-
     <TemplateColumn Title="Breyta">
                         <button class="btn btn-primary" @onclick="@(() => ButtonOnClickBreyta(context.ID))">Breyta </button>
     </TemplateColumn>
-   <TemplateColumn Title="Eyða">
+    <TemplateColumn Title="Eyða">
                         <button class="btn btn-primary" @onclick="@(() => ButtonOnClickEyda(context.ID))">
               Eyða
              </button>
     </TemplateColumn>
  
 </QuickGrid>
-                    <Paginator State="@pagination" />
+                    </div>
+<Paginator State="@pagination" />
     </td>
       <td valign="top">
                 <div class="mt-4">
@@ -718,6 +923,8 @@
 
 }
 @code {
+    string strNOTANDI;
+
 
     PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
     IQueryable<kortlagning>? itemsQueryable;
@@ -726,6 +933,8 @@
     {
         itemsQueryable = ( GetKortlagningar().AsQueryable());
     }
+
+
 
     DataTable dt = new DataTable();
     async Task OpenExcelFileFromDisk(InputFileChangeEventArgs e)
@@ -747,6 +956,7 @@
                 {
                     foreach (IXLCell cell in row.Cells())
                     {
+                       
                         dt.Columns.Add(cell.Value.ToString());
                     }
                     firstRow = false;
@@ -802,7 +1012,7 @@
 
     }
 
-   
+
 
     bool bBreyta = false; //stýra breytingum við skráning
     bool bEyda = false; //only in eyðing
@@ -810,6 +1020,26 @@
     bool bBuaSkjalamyndara = false;
     bool showDalka = false;
     bool ShowOnlyMine = true;
+
+    string strLeitVorslustofnun;
+    string strLeitSkjalmyndari;
+    string strLeitSveitarfélag;
+    string strLeitHeitiKerfis;
+    string strLeitGerdSafns; //er listi
+    string strLeitHlutverk;
+    string strleitAbyrgd;
+    string strLeitStarfsEining;
+    string strLeitTengilidur;
+    string strLeitBirgi;
+    string strLeitHysing;
+    string strLeitDagsNotkun;
+    string strLeitDagsTilkynnt;
+    string strLeitVardveisla; //er listi?
+    string strLeitStaerd;
+    string strLeitNotkun;
+    string strLeitAthugasemdir;
+    string strLeitSkil;
+    bool bLeitSkilad;
 
     bool showAbyrgd = false;
     bool showStarfseining = false;
@@ -824,6 +1054,20 @@
     bool ShowAthugasemdir = false;
     bool ShowSkil = false;
     bool ShowSkilBuid = true;
+
+    bool showAbyrgdImport = true;
+    bool showStarfseiningImport = true;
+    bool showTengilidImport = true;
+    bool showBirgjaImport = true;
+    bool showHysingImport = true;
+    bool showDagsNotkunImport = true;
+    bool showDagsTilkynntImport = true;
+    bool showVardveislaImport = true;
+    bool showStaerdImport = true;
+    bool showNotkunImport = true;
+    bool ShowAthugasemdirImport = true;
+    bool ShowSkilImport = true;
+    bool ShowSkilBuidImport = true;
 
 
     async Task ExportData()
@@ -897,6 +1141,7 @@
         {
             _httpContext.HttpContext.Session.SetString("_Error", string.Empty);
             _httpContext.HttpContext.Session.SetString("_User", strUser);
+            strNOTANDI = _httpContext.HttpContext.Session.GetString("_User");
             strUser = string.Empty;
             strPass = string.Empty;
 
@@ -942,15 +1187,22 @@
 
     public IQueryable <kortlagning> GetKortlagningar()
     {
+        string strVarsla = string.Empty;
         if (ShowOnlyMine)
         {
-            string strVarsla = _httpContext.HttpContext.Session.GetString("_User");
-            return kortlagningService.GetKortlagningarVorslu(strVarsla);
+            strVarsla = _httpContext.HttpContext.Session.GetString("_User");
         }
-        else
-        {
-            return kortlagningService.GetKortlagningarAllt();
-        }
+        
+          
+            return kortlagningService.GetKortlagningarVorslu(strVarsla, strLeitVorslustofnun, strLeitSkjalmyndari, strLeitSveitarfélag, strLeitHeitiKerfis, strLeitGerdSafns, strLeitHlutverk, strleitAbyrgd, strLeitStarfsEining, strLeitTengilidur, strLeitBirgi, strLeitHysing, strLeitDagsNotkun, strLeitDagsTilkynnt, strLeitVardveisla, strLeitStaerd, strLeitNotkun, strLeitAthugasemdir, strLeitSkil, bLeitSkilad);
+            
+
+            
+       
+        // else
+        // {
+        //     return kortlagningService.GetKortlagningarAllt();
+        // }
     }
 
     int iKortID = 0;
@@ -1113,6 +1365,9 @@
         //vista excell gögn
         string strVarsla = _httpContext.HttpContext.Session.GetString("_User");
         kortlagningService.flytjainnKortlagningu(dt, iIDskjal, strVarsla);
+        dt.Rows.Clear();
+        isShowing = false;
+        iIDskjal = 0;
     }
 
     public void nyskraKort()
@@ -1149,9 +1404,13 @@
 
     public void eydaKort()
     {
-        kortlagningService.eydaKort(iIDeyda);
-        bEyda = false;
-        iIDeyda = 0;
+        if(iIDeyda != 0)
+        {
+            kortlagningService.eydaKort(iIDeyda);
+            bEyda = false;
+            iIDeyda = 0;
+        }
+      
     }
     // public void breyta(int id, string strHeiti)
     // {
@@ -1277,14 +1536,24 @@
             strSkjalSimi = string.Empty;
         }
     }
+    
     void ButtonOnClickImport()
     {
         question = "Nýskráning kortlagningar";
-        size = DialogSize.ExtraExtraLarge;
+        size = DialogSize.FullScreen;
         dialogResult = null;
         isShowing = true;
         bBreyta = false;
         bImport = true;
+
+        strSkjalHeiti = string.Empty;
+        strSkjalSveit = string.Empty;
+        strSkjalTengi = string.Empty;
+        strSkjalStarf = string.Empty;
+        strSkjalHeim = string.Empty;
+        strSkjalTolv = string.Empty;
+        strSkjalSimi = string.Empty;
+
         getImport();
     }
     void ButtonOnClickNytt()
